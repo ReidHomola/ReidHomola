@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Except...
+!.gitignore
+!create_cards_terminal.py
+!create_cards_zap.py
+
+# Even if they are in subdirectories
+!*/
