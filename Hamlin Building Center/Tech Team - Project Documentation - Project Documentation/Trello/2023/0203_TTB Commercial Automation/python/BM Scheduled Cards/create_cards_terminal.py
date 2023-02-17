@@ -14,8 +14,6 @@ TOKEN       = 'ATTAc7971e017e294d0507b749e386b16a9e364b1cc93690191afad1cf2ea061d
 TODAY       = datetime.date.today().isoformat()             # All cards will be created with todays date at the end of the name
 today_datetime = datetime.datetime.fromisoformat(TODAY)
 DUE_DATE    = today_datetime + datetime.timedelta(days=1, hours=23)  # All cards will be created with this due date
-RICKS_LIST_ID  = '636125ff2f293f037e185a4d'                    # BM List in Lake Norden Estimating
-JASONS_LIST_ID = '62e28fd31d9a77064e10a8b3'                    # Inbox in Jason Saathoff
 
 # FUNCTION DEFINITIONS
 def create_card(name, origin_card_id, dest_list_id):
@@ -58,68 +56,46 @@ def archive_card(cardId):
     )
 
 # INITIALIZING THE PARAMETERS
+trigger_card_id = sys.argv[2]
 input_str  = sys.argv[1] # Gets the input str which starts with 'zap'
-input_list = input_str.split(sep=';')
-trigger_card_id = sys.argv[2] # Id of card to archive after completion
+inputs = input_str.split(sep=';')
 
-if input_list[0] != 'zap': # Checks if comment is meant to trigger a zap
-    print("input doesn't start with 'zap'")
+if inputs[0] != 'zap': # Checks if comment is meant to trigger a zap
+    print("input_str doesn't start with 'zap'")
     exit()
-cmd_type = input_list[1]
-cmds = input_list[2:]
 
-# CREATE THE CARDS
-for cmd in cmds:
-    if cmd == 'site_walk_around':
-        name = 'Site Walk Around - ' + TODAY                 # Set name of new card
-        origin_card_id = '63ea765c4994881246a24666'          # Set destination list id
-        create_card(name, origin_card_id, RICKS_LIST_ID)     # Call function to create new card
-        create_card(name, origin_card_id, JASONS_LIST_ID)    # Call function to create new card
+cmd_type = inputs[1][inputs[1].find('=') + 1:]
 
-    elif cmd == 'customer_profitability':
-        name = 'Customer Profitability - ' + TODAY
-        origin_card_id = '63ea7631654b8ea91b818b83'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
+if cmd_type == 'BM_scheduled_cards':
+    cmds = inputs[2:]
 
-    elif cmd == 'invoiced_orders_left_in_order_monitor':
-        name = 'Invoiced Orders left in Order Monitor - ' + TODAY
-        origin_card_id = '63ea78362ebe0f1ed72075f9'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
+    # CREATE THE CARDS FOR EACH COMMAND
+    for cmd in cmds:
+        # SETUP PARAMETERS FOR THIS COMMAND
+        cmd_params = cmd.split()
+        cmd_name = cmd_params[0][cmd_params[0].find('=') + 1:]
+        origin_card_id = cmd_params[1][cmd_params[1].find('=') + 1:]
+        dest_list_ids = cmd_params[2][cmd_params[2].find('=') + 1:].split(',')
 
-    elif cmd == 'review_product_group_sales':
-        name = 'Review Product Group Sales - ' + TODAY
-        origin_card_id = '63ea76e7032fd4b41d25b47c'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
+        # DEFINE LOCAL FUNCTION
+        def create_cards(name):
+            for dest_list_id in dest_list_ids:
+                create_card(name, origin_card_id, dest_list_id)
+        
+        # CREATE THE CARDS
+        if   cmd_name == 'site_walk_around':                         create_cards('Site Walk Around - ' + TODAY)
+        elif cmd_name == 'customer_profitability':                   create_cards('Customer Profitability - ' + TODAY)
+        elif cmd_name == 'invoiced_orders_left_in_order_monitor':    create_cards('Invoiced Orders left in Order Monitor - ' + TODAY)
+        elif cmd_name == 'review_product_group_sales':               create_cards('Review Product Group Sales - ' + TODAY)
+        elif cmd_name == 'review_open_orders':                       create_cards('Review Open Orders - ' + TODAY)
+        elif cmd_name == 'bistrack_review_zz_on_hand_not_allocated': create_cards('Bistrack - Review ZZ on Hand Not Allocated - ' + TODAY)
+        elif cmd_name == 'review_job_closures_tax_codes':            create_cards('Review Job Closures / Tax Codes - ' + TODAY)
+        elif cmd_name == 'customer_ar_report':                       create_cards('Customer AR Report - ' + TODAY)
+        else:                                                        print(f'Command not found ({cmd_name})')
 
-    elif cmd == 'review_open_orders':
-        name = 'Review Open Orders - ' + TODAY
-        origin_card_id = '63ea6d897031a3d74ea26e39'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
+    # ARCHIVE THE TRIGGER CARD
+    archive_card(trigger_card_id)
 
-    elif cmd == 'bistrack_review_zz_on_hand_not_allocated':
-        name = 'Bistrack - Review ZZ on Hand Not Allocated - ' + TODAY
-        origin_card_id = '63ea6e8a1d1911891ed61ed8'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
-
-    elif cmd == 'review_job_closures_tax_codes':
-        name = 'Review Job Closures / Tax Codes - ' + TODAY
-        origin_card_id = '63ea6f4c85b41d394dcfef9c'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
-
-    elif cmd == 'customer_ar_report':
-        name = 'Customer AR Report - ' + TODAY
-        origin_card_id = '63ea7809247630aa57ad6515'
-        create_card(name, origin_card_id, RICKS_LIST_ID)
-        create_card(name, origin_card_id, JASONS_LIST_ID)
-
-    else:
-        print(f'Command not found ({cmd})')
-
-# ARCHIVE THE TRIGGER CARD
-archive_card(trigger_card_id)
+else:
+    print(f"cmd_type '{cmd_type}' not found")
+    exit()
