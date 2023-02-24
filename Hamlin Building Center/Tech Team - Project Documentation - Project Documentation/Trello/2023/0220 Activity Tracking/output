@@ -1,0 +1,28 @@
+andrewjulson: 36
+cameronlehtola: 142
+carolinehallstrom: 97
+codyweber22: 117
+cory83963449: 116
+damonstormo: 72
+daniellesnar: 62
+erinthiex: 24
+jasonsaathoff: 36
+jennyjasper3: 168
+joe37201934: 39
+kamdenhomola1: 243
+masonbunker: 23
+mattsquires5: 0
+rick36618919: 79
+rubenlopez270: 85
+ryanlove21: 55
+shanevandamme1: 139
+cameronlarson3: 23
+lasonwilen2: 93
+
+Actions That Trigger an Activity in the Report:
+ addAttachmentToCard           addChecklistToCard            commentCard
+ convertToCardFromCheckItem    copyCard                      copyCommentCard
+ createCard                    createList                    deleteCard
+ emailCard                     moveCardFromBoard             moveListFromBoard
+ removeChecklistFromCard       updateBoard                   updateCard
+ updateCheckItemStateOnCard    updateChecklist               updateList
